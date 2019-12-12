@@ -32,6 +32,8 @@
 #define ESP32_FORUM_PINOUT_WITH_LATCH   1
 #define SMARTLED_SHIELD_V0_PINOUT       2
 #define ESP32_JC_RIBBON_PINOUT          3
+#define TIDBYT_V1_PINOUT                4
+#define TIDBYT_V2_PINOUT                5
 
 #ifndef GPIOPINOUT
 #define GPIOPINOUT ESP32_FORUM_PINOUT
@@ -40,23 +42,23 @@
 //#define GPIOPINOUT SMARTLED_SHIELD_V0_PINOUT
 
 //Upper half RGB
-#define BIT_R1  (1<<0)   
-#define BIT_G1  (1<<1)   
-#define BIT_B1  (1<<2)   
+#define BIT_R1  (1<<0)
+#define BIT_G1  (1<<1)
+#define BIT_B1  (1<<2)
 //Lower half RGB
-#define BIT_R2  (1<<3)   
-#define BIT_G2  (1<<4)   
-#define BIT_B2  (1<<5)   
+#define BIT_R2  (1<<3)
+#define BIT_G2  (1<<4)
+#define BIT_B2  (1<<5)
 
 // Control Signals
-#define BIT_LAT (1<<6) 
-#define BIT_OE  (1<<7)  
+#define BIT_LAT (1<<6)
+#define BIT_OE  (1<<7)
 
-#define BIT_A (1<<8)    
-#define BIT_B (1<<9)    
-#define BIT_C (1<<10)   
-#define BIT_D (1<<11)   
-#define BIT_E (1<<12)   
+#define BIT_A (1<<8)
+#define BIT_B (1<<9)
+#define BIT_C (1<<10)
+#define BIT_D (1<<11)
+#define BIT_E (1<<12)
 
 
 #if (GPIOPINOUT == ESP32_JC_RIBBON_PINOUT)
@@ -69,7 +71,7 @@
 // 23, 22, 27 (was 3), 21, 19, 18, 5, 17,    16, 4, 0, 2, 15, 14, 12, 13
 
     // ADDX is output directly using GPIO
-    #define CLKS_DURING_LATCH   0 
+    #define CLKS_DURING_LATCH   0
     #define MATRIX_I2S_MODE I2S_PARALLEL_BITS_16
     #define MATRIX_DATA_STORAGE_TYPE uint16_t
 
@@ -100,16 +102,16 @@
 
     9	A	16/RX2	Demux Input A0
     10	B	4	Demux Input A1
-    
+
     11	C	0/Boot	Demux Input A2
     12	D	2 	Demux Input E1, E3 (32x32 panels only)
 
     13	CLK	15 	LED Drivers' Clock
     14	STB	14 	LED Drivers' Latch
-    
+
     15	OE	12	LED Drivers' Output Enable
     16	GND	13/GND	Ground
-    */ 
+    */
     #define R1_PIN  23
     #define G1_PIN  22
     #define B1_PIN  27
@@ -135,7 +137,7 @@
     #pragma message "ESP32 forum wiring"
 
     // ADDX is output directly using GPIO
-    #define CLKS_DURING_LATCH   0 
+    #define CLKS_DURING_LATCH   0
     #define MATRIX_I2S_MODE I2S_PARALLEL_BITS_16
     #define MATRIX_DATA_STORAGE_TYPE uint16_t
 
@@ -156,25 +158,25 @@
 
     3	B0	4	Blue Data (columns 1-16)
     4	GND	GND	Ground
-    
+
     5	R1	16/RX2	Red Data (columns 17-32)
     6	G1	27	Green Data (columns 17-32)
-    
+
     7	B1	17/TX2	Blue Data (columns 17-32)
     8	E	12	Demux Input E for 64x64 panels
-   
+
     9	A	5	Demux Input A0
     10	B	18	Demux Input A1
 
     11	C	19	Demux Input A2
     12	D	21	Demux Input E1, E3 (32x32 panels only)
-    
+
     13	CLK	22	LED Drivers' Clock
     14	STB	26	LED Drivers' Latch
-    
+
     15	OE	25	LED Drivers' Output Enable
     16	GND	GND	Ground
-    */ 
+    */
     #define R1_PIN  2
     #define G1_PIN  15
     #define B1_PIN  4
@@ -258,6 +260,60 @@
 
     #define GPIO_PWM0A_OUT GPIO_NUM_33
     #define GPIO_SYNC0_IN  GPIO_NUM_32
+
+#elif (GPIOPINOUT == TIDBYT_V1_PINOUT)
+
+    // ADDX is output directly using GPIO
+    #define CLKS_DURING_LATCH   0
+    #define MATRIX_I2S_MODE I2S_PARALLEL_BITS_16
+    #define MATRIX_DATA_STORAGE_TYPE uint16_t
+
+    #define R1_PIN 13
+    #define G1_PIN 15
+    #define B1_PIN 12
+    #define R2_PIN 14
+    #define G2_PIN 5
+    #define B2_PIN 27
+
+    #define A_PIN 26
+    #define B_PIN 18
+    #define C_PIN 25
+    #define D_PIN 19
+    #define E_PIN -1
+    #define LAT_PIN 21
+    #define OE_PIN 23
+
+    #define CLK_PIN 22
+
+    #define GPIO_PWM0A_OUT GPIO_NUM_32
+    #define GPIO_SYNC0_IN  GPIO_NUM_34
+
+#elif (GPIOPINOUT == TIDBYT_V2_PINOUT)
+
+    // ADDX is output directly using GPIO
+    #define CLKS_DURING_LATCH   0
+    #define MATRIX_I2S_MODE I2S_PARALLEL_BITS_16
+    #define MATRIX_DATA_STORAGE_TYPE uint16_t
+
+    #define R1_PIN 2
+    #define G1_PIN 4
+    #define B1_PIN 33
+    #define R2_PIN 32
+    #define G2_PIN 5
+
+    #define B2_PIN 27
+    #define A_PIN 26
+    #define B_PIN 18
+    #define C_PIN 25
+    #define D_PIN 19
+    #define E_PIN -1
+    #define LAT_PIN 21
+    #define OE_PIN 23
+
+    #define CLK_PIN 22
+    #define GPIO_PWM0A_OUT GPIO_NUM_32
+    #define GPIO_SYNC0_IN  GPIO_NUM_34
+
 #endif
 
 //#define DEBUG_PINS_ENABLED

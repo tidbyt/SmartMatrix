@@ -38,6 +38,8 @@
 #define HUB75_ADAPTER_V0_SMT_PINOUT     7
 #define ESP32_JC_RIBBON_PINOUT_WEMOS    8
 
+#define TIDBYT_V6_PINOUT 66
+
 #ifndef GPIOPINOUT
 #define GPIOPINOUT ESP32_FORUM_PINOUT
 #endif
@@ -488,6 +490,31 @@
     // this pin can be manually toggled when the latch pin is high to send CLK pulses to the panel (noramlly latch blocks clock)
     #define CLK_MANUAL_PIN GPIO_NUM_22
 
+#elif (GPIOPINOUT == TIDBYT_V6_PINOUT)
+
+    #pragma message "tidbyt v6 wiring"
+
+    // ADDX is output directly using GPIO
+    #define CLKS_DURING_LATCH   0
+    #define MATRIX_I2S_MODE I2S_PARALLEL_BITS_16
+    #define MATRIX_DATA_STORAGE_TYPE uint16_t
+
+    #define R1_PIN  GPIO_NUM_21
+    #define G1_PIN  GPIO_NUM_2
+    #define B1_PIN  GPIO_NUM_22
+    #define R2_PIN  GPIO_NUM_23
+    #define G2_PIN  GPIO_NUM_4
+    #define B2_PIN  GPIO_NUM_27
+
+    #define A_PIN   GPIO_NUM_26
+    #define B_PIN   GPIO_NUM_5
+    #define C_PIN   GPIO_NUM_25
+    #define D_PIN   GPIO_NUM_18
+    #define E_PIN   -1
+    #define LAT_PIN GPIO_NUM_19
+    #define OE_PIN  GPIO_NUM_32
+
+    #define CLK_PIN GPIO_NUM_33
 #endif
 
 //#define DEBUG_PINS_ENABLED

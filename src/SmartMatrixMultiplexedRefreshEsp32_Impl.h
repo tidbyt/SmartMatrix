@@ -42,7 +42,7 @@
 #include "driver/mcpwm.h"
 #include "soc/mcpwm_reg.h"
 #include "soc/mcpwm_struct.h"
-#include "rom/lldesc.h"
+#include "esp32/rom/lldesc.h"
 
 #define INLINE __attribute__( ( always_inline ) ) inline
 

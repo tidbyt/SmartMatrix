@@ -486,8 +486,8 @@ INLINE void SmartMatrix3<refreshDepth, matrixWidth, matrixHeight, panelType, opt
     // go through this process for each physical row that is contained in the refresh row
     do {
         // clear buffer to prevent garbage data showing through transparent layers
-        memset(tempRow0, 0x00, sizeof(rgb48) * numPixelsPerTempRow);
-        memset(tempRow1, 0x00, sizeof(rgb48) * numPixelsPerTempRow);
+        memset(static_cast<void*>(tempRow0), 0x00, sizeof(rgb48) * numPixelsPerTempRow);
+        memset(static_cast<void*>(tempRow1), 0x00, sizeof(rgb48) * numPixelsPerTempRow);
 
 #if (REFRESH_PRINTFS >= 1)
         printf("multiRowRefreshRowOffset = %d\r\n", multiRowRefreshRowOffset);
@@ -805,8 +805,8 @@ INLINE void SmartMatrix3<refreshDepth, matrixWidth, matrixHeight, panelType, opt
     // go through this process for each physical row that is contained in the refresh row
     do {
         // clear buffer to prevent garbage data showing through transparent layers
-        memset(tempRow0, 0x00, sizeof(rgb24) * numPixelsPerTempRow);
-        memset(tempRow1, 0x00, sizeof(rgb24) * numPixelsPerTempRow);
+        memset(static_cast<void*>(tempRow0), 0x00, sizeof(rgb24) * numPixelsPerTempRow);
+        memset(static_cast<void*>(tempRow1), 0x00, sizeof(rgb24) * numPixelsPerTempRow);
 
         // get a row of physical pixel data (HUB75 paired) from the layers
         SM_Layer * templayer = SmartMatrix3<refreshDepth, matrixWidth, matrixHeight, panelType, optionFlags>::baseLayer;

@@ -1,6 +1,7 @@
 {
     "name": "SmartMatrix",
     "build": {
-        "includeDir": "src"
+        "includeDir": "src",
+        "flags": "-DESP32"
     }
 }

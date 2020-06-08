@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 #include "soc/i2s_struct.h"
-#include "rom/lldesc.h"
+#include "esp32/rom/lldesc.h"
 
 typedef enum {
     I2S_PARALLEL_BITS_8=8,

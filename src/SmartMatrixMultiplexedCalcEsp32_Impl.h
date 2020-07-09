@@ -117,18 +117,20 @@ void SmartMatrix3<refreshDepth, matrixWidth, matrixHeight, panelType, optionFlag
     static unsigned long lastMillisEnd;
     static int refreshFramesSinceLastCalculation = 0;
 
-    if(++refreshFramesSinceLastCalculation < calc_refreshRateDivider)
-        return;
+    if (!(optionFlags & SMARTMATRIX_OPTIONS_ESP32_NO_CALC_TASK)) {
+        if(++refreshFramesSinceLastCalculation < calc_refreshRateDivider)
+            return;
 
-    refreshFramesSinceLastCalculation = 0;
+        refreshFramesSinceLastCalculation = 0;
 
-    // safety check - if using up too much CPU, increase refresh rate divider to give more time for sketch to run
-    unsigned long calculationCpuTime = lastMillisEnd - lastMillisStart;
-    unsigned long totalCpuTime = millis() - lastMillisStart;
-    if(totalCpuTime && ((calculationCpuTime * 100) / totalCpuTime) > SmartMatrix3<refreshDepth, matrixWidth, matrixHeight, panelType, optionFlags>::maxCalcCpuPercentage) {
-        // increase CPU divider by 1
-        SmartMatrix3<refreshDepth, matrixWidth, matrixHeight, panelType, optionFlags>::setCalcRefreshRateDivider(SmartMatrix3<refreshDepth, matrixWidth, matrixHeight, panelType, optionFlags>::getCalcRefreshRateDivider() + 1);
-        refreshRateLowered = true;
+        // safety check - if using up too much CPU, increase refresh rate divider to give more time for sketch to run
+        unsigned long calculationCpuTime = lastMillisEnd - lastMillisStart;
+        unsigned long totalCpuTime = millis() - lastMillisStart;
+        if(totalCpuTime && ((calculationCpuTime * 100) / totalCpuTime) > SmartMatrix3<refreshDepth, matrixWidth, matrixHeight, panelType, optionFlags>::maxCalcCpuPercentage) {
+            // increase CPU divider by 1
+            SmartMatrix3<refreshDepth, matrixWidth, matrixHeight, panelType, optionFlags>::setCalcRefreshRateDivider(SmartMatrix3<refreshDepth, matrixWidth, matrixHeight, panelType, optionFlags>::getCalcRefreshRateDivider() + 1);
+            refreshRateLowered = true;
+        }
     }
 
     lastMillisStart = millis();
@@ -285,22 +287,27 @@ bool SmartMatrix3<refreshDepth, matrixWidth, matrixHeight, panelType, optionFlag
 }
 
 template <int refreshDepth, int matrixWidth, int matrixHeight, unsigned char panelType, unsigned char optionFlags>
+void SmartMatrix3<refreshDepth, matrixWidth, matrixHeight, panelType, optionFlags>::tick() {
+    // we usually do this with an ISR in the refresh class, but ESP32 doesn't let us store a templated method in IRAM (at least not easily) so we call this from the calc task
+    SmartMatrix3RefreshMultiplexed<refreshDepth, matrixWidth, matrixHeight, panelType, optionFlags>::markRefreshComplete();
+
+    matrixCalculations();
+}
+
+template <int refreshDepth, int matrixWidth, int matrixHeight, unsigned char panelType, unsigned char optionFlags>
 TaskHandle_t SmartMatrix3<refreshDepth, matrixWidth, matrixHeight, panelType, optionFlags>::calcTaskHandle;
 
 /* Task2 with priority 2 */
 template <int refreshDepth, int matrixWidth, int matrixHeight, unsigned char panelType, unsigned char optionFlags>
 void SmartMatrix3<refreshDepth, matrixWidth, matrixHeight, panelType, optionFlags>::calcTask(void* pvParameters)
 {        
-    while(1) {   
+    while(1) {
         if( xSemaphoreTake(calcTaskSemaphore, portMAX_DELAY) == pdTRUE ) {
 #ifdef DEBUG_PINS_ENABLED
             gpio_set_level(DEBUG_1_GPIO, 1);
 #endif
 
-            // we usually do this with an ISR in the refresh class, but ESP32 doesn't let us store a templated method in IRAM (at least not easily) so we call this from the calc task
-            SmartMatrix3RefreshMultiplexed<refreshDepth, matrixWidth, matrixHeight, panelType, optionFlags>::markRefreshComplete();
-
-            matrixCalculations();
+            tick();
 
 #ifdef DEBUG_PINS_ENABLED
             gpio_set_level(DEBUG_1_GPIO, 0);
@@ -335,8 +342,10 @@ void SmartMatrix3<refreshDepth, matrixWidth, matrixHeight, panelType, optionFlag
     if(optionFlags & SMARTMATRIX_OPTIONS_ESP32_CALC_TASK_CORE_1)
         calcTaskCore = 1;
 
-    // TODO: fine tune stack size: 1000 works with 64x64/32-24bit, 500 doesn't, does it change based on matrix size, depth?
-    xTaskCreatePinnedToCore(calcTask, "SmartMatrixCalc", 1000, NULL, taskPriority, &calcTaskHandle, calcTaskCore);
+    if (!(optionFlags & SMARTMATRIX_OPTIONS_ESP32_NO_CALC_TASK)) {
+        // TODO: fine tune stack size: 1000 works with 64x64/32-24bit, 500 doesn't, does it change based on matrix size, depth?
+        xTaskCreatePinnedToCore(calcTask, "SmartMatrixCalc", 1000, NULL, taskPriority, &calcTaskHandle, calcTaskCore);
+    }
 
     printf("SmartMatrix Layers Allocated from Heap:\r\n");
     show_esp32_heap_mem();
@@ -366,6 +375,9 @@ void SmartMatrix3<refreshDepth, matrixWidth, matrixHeight, panelType, optionFlag
 
     // wait for matrixCalculations to be run for first time inside calcTask - fill initial buffer and set Layer properties that are only set after first pass through matrixCalculations()
     while(rotationChange) {
+        if (optionFlags & SMARTMATRIX_OPTIONS_ESP32_NO_CALC_TASK) {
+            tick();
+        }
         delay(1);
     }
 }

@@ -55,6 +55,9 @@ public:
     // debug
     void countFPS(void);
 
+    // manual control without a calc task
+    static void tick(void);
+
     // functions called by ISR
     static void matrixCalculations(void);
     static void dmaBufferUnderrunCallback(void);
